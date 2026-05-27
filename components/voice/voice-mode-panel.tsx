@@ -89,9 +89,25 @@ export function VoiceModePanel() {
           className="mb-6 sm:mb-8"
         />
 
-        <p className="max-w-md text-center text-sm font-medium text-foreground/90">
-          {session.statusLabel}
-        </p>
+        <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5">
+          <span
+            className={cn(
+              "size-2.5 rounded-full",
+              session.phase === "listening"
+                ? "bg-cyan-400 animate-pulse"
+                : session.phase === "user_speaking"
+                  ? "bg-emerald-400 animate-pulse"
+                  : session.phase === "speaking"
+                    ? "bg-violet-400 animate-pulse"
+                    : session.phase === "thinking"
+                      ? "bg-amber-400 animate-pulse"
+                      : "bg-slate-400"
+            )}
+          />
+          <p className="text-center text-sm font-medium text-foreground/90">
+            {session.statusLabel}
+          </p>
+        </div>
 
         {connected && session.voiceEnabled ? (
           <p className="mt-2 text-center text-[11px] text-muted-foreground/70">
@@ -148,6 +164,23 @@ export function VoiceModePanel() {
               <span className="paios-voice-agent__btn-glow absolute inset-0 rounded-full" />
             ) : null}
           </button>
+          {connected ? (
+            <div className="mt-1 h-1.5 w-40 overflow-hidden rounded-full bg-white/[0.06]">
+              <div
+                className={cn(
+                  "h-full rounded-full transition-[width,background] duration-200",
+                  session.phase === "speaking"
+                    ? "bg-violet-400/70"
+                    : session.phase === "user_speaking" || session.phase === "listening"
+                      ? "bg-cyan-400/70"
+                      : session.phase === "thinking"
+                        ? "bg-amber-400/80"
+                        : "bg-slate-400/60"
+                )}
+                style={{ width: `${Math.min(100, Math.max(8, Math.round(session.displayLevel * 100)))}%` }}
+              />
+            </div>
+          ) : null}
 
           <p className="text-center text-[11px] text-muted-foreground/75">
             {session.voiceEnabled

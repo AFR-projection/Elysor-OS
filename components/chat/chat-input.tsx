@@ -83,31 +83,38 @@ export function ChatInput({
             ) : null}
 
             {onVoiceToggle ? (
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                onClick={onVoiceToggle}
-                disabled={(disabled && !isLoading && !isVoiceBusy) || isVoiceBusy}
-                className={cn(
-                  "size-10 shrink-0 rounded-xl",
-                  isVoiceRecording
-                    ? "bg-red-500/12 text-red-300 ring-1 ring-red-400/25"
-                    : "text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
-                )}
-                aria-label={
-                  isVoiceRecording
-                    ? "Stop rekam — tap untuk transkrip"
-                    : "Rekam suara — tap untuk mulai"
-                }
-                title={
-                  isVoiceRecording
-                    ? "Tap lagi untuk kirim transkrip"
-                    : "Tap mic → bicara → tap lagi"
-                }
-              >
-                <Mic className={cn("size-4", isVoiceBusy && "animate-pulse")} />
-              </Button>
+              <div className="relative">
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={onVoiceToggle}
+                  disabled={(disabled && !isLoading && !isVoiceBusy) || isVoiceBusy}
+                  className={cn(
+                    "size-10 shrink-0 rounded-xl",
+                    isVoiceRecording
+                      ? "bg-red-500/12 text-red-300 ring-1 ring-red-400/25"
+                      : "text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
+                  )}
+                  aria-label={
+                    isVoiceRecording
+                      ? "Stop rekam — tap untuk transkrip"
+                      : "Rekam suara — tap untuk mulai"
+                  }
+                  title={
+                    isVoiceRecording
+                      ? "Tap lagi untuk kirim transkrip"
+                      : "Tap mic → bicara → tap lagi"
+                  }
+                >
+                  <Mic className={cn("size-4", isVoiceBusy && "animate-pulse")} />
+                </Button>
+                {isVoiceRecording ? (
+                  <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 text-[10px] text-red-300/90">
+                    REC
+                  </span>
+                ) : null}
+              </div>
             ) : null}
 
             <Textarea

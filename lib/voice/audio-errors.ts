@@ -15,7 +15,8 @@ export function shouldFallbackFromOpenRouterAudio(message: string): boolean {
   return (
     isOpenRouterCreditError(message) ||
     isOpenRouterAuthError(message) ||
-    /\b402\b|\b503\b|\b429\b/.test(message)
+    /\b402\b|\b503\b|\b429\b/.test(message) ||
+    /OPENROUTER_API_KEY|environment variable is not set/i.test(message)
   );
 }
 

@@ -27,7 +27,7 @@ export function useSmartVoiceInput(options: SmartVoiceOptions) {
   const transcribeBlob = useCallback(async (blob: Blob, language?: string) => {
     try {
       return await transcribeAudioBlob(blob, language);
-    } catch (apiError) {
+      } catch (apiError) {
       const message =
         apiError instanceof Error ? apiError.message : "Transkripsi gagal";
 
@@ -36,7 +36,7 @@ export function useSmartVoiceInput(options: SmartVoiceOptions) {
         return listenWithBrowserStt(language);
       }
 
-      throw apiError;
+        throw new Error(message);
     }
   }, []);
 
