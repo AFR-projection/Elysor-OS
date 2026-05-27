@@ -8,6 +8,7 @@ import {
   type MemoryVectorStats,
 } from "@/lib/memories-client";
 import type { MemoryPreferences } from "@/lib/memory-preferences";
+import { fetchServerMemoryPrefs, updateServerMemoryPrefs } from "@/lib/memories-client";
 import { cn } from "@/lib/utils";
 import { MEMORY_TYPE_LABELS, type MemoryType } from "@/types/memory";
 
@@ -31,6 +32,7 @@ export function MemorySettingsPanel({
     null
   );
   const [backfilling, setBackfilling] = useState(false);
+  const [hybridAlpha, setHybridAlpha] = useState<number | null>(null);
 
   const loadVectorStats = useCallback(async () => {
     try {
@@ -42,7 +44,15 @@ export function MemorySettingsPanel({
   }, []);
 
   useEffect(() => {
-    void loadVectorStats();
+    void (async () => {
+      await loadVectorStats();
+      try {
+        const { prefs } = await fetchServerMemoryPrefs();
+        setHybridAlpha(typeof (prefs as any).hybridAlpha === "number" ? (prefs as any).hybridAlpha : 0.62);
+      } catch {
+        setHybridAlpha(0.62);
+      }
+    })();
   }, [loadVectorStats, total]);
 
   const recallLabel =
@@ -161,6 +171,42 @@ export function MemorySettingsPanel({
           onChange={(checked) => onPrefsChange({ autoLearnFromChat: checked })}
         />
 
+        {hybridAlpha !== null && (
+          <div className="space-y-2 pt-1">
+            <label className="text-xs font-medium text-muted-foreground">
+              Hybrid balance (Keyword ↔ Vector)
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={hybridAlpha}
+                onChange={(e) => setHybridAlpha(Number(e.target.value))}
+                onMouseUp={async () => {
+                  try {
+                    await updateServerMemoryPrefs({ hybridAlpha: hybridAlpha! });
+                  } catch {
+                    // ignore
+                  }
+                }}
+                className="flex-1"
+              />
+              <span className="w-12 text-right text-xs tabular-nums">
+                {Math.round((hybridAlpha ?? 0.62) * 100)}%
+              </span>
+            </div>
+            <p className="text-[10px] text-muted-foreground/70">
+              {hybridAlpha < 0.5
+                ? "Fokus keyword (lebih presisi untuk istilah spesifik)"
+                : hybridAlpha > 0.5
+                  ? "Fokus semantic vector (lebih kontekstual dan fuzzy match)"
+                  : "Seimbang antara keyword & vector"}
+            </p>
+          </div>
+        )}
+
         <SettingToggle
           icon={<Zap className="size-3.5 text-cyan-300" />}
           label="Tampilkan memori sesi"
@@ -193,8 +239,8 @@ export function MemorySettingsPanel({
         </div>
 
         <p className="text-[10px] leading-relaxed text-muted-foreground/65">
-          Satu DB Neon — metadata + pgvector ANN recall. Keyword fallback otomatis
-          jika extension belum aktif.
+          Satu DB Neon — metadata + pgvector ANN recall. Hybrid (keyword + vector)
+          dengan reweight real-time; keyword fallback otomatis jika pgvector nonaktif.
         </p>
       </div>
     </div>

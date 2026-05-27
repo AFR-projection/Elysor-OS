@@ -6,6 +6,7 @@ import {
   parseEmbedding,
 } from "@/services/memory/similarity";
 import type { MemoryType, RecallMethod, RecalledMemory } from "@/types/memory";
+import { getServerMemoryPreferences } from "@/services/memory/prefs";
 
 type MemoryCandidate = {
   id: string;
@@ -158,6 +159,9 @@ async function recallViaPgVector(
         LIMIT ${fetchLimit}
       `;
 
+  const prefs = await getServerMemoryPreferences();
+  const alpha = Math.min(1, Math.max(0, Number(prefs.hybridAlpha ?? 0.62)));
+
   const scored = (rows as MemoryCandidate[])
     .map((m) => {
       const kw = keywordScore(m, tokens, conversationId);
@@ -165,8 +169,7 @@ async function recallViaPgVector(
       const vectorScore = Math.max(0, Number(m.similarity) || 0);
       const pinnedBoost = m.pinned ? 0.08 : 0;
       const importanceBoost = Math.min(0.05, m.importance * 0.005);
-      const combined =
-        vectorScore * 0.62 + kwNorm * 0.28 + pinnedBoost + importanceBoost;
+      const combined = vectorScore * alpha + kwNorm * (1 - alpha) + pinnedBoost + importanceBoost;
 
       return {
         id: m.id,
@@ -210,6 +213,9 @@ async function recallViaLegacyScan(
     return scoreCandidates(candidates, query, { conversationId, limit });
   }
 
+  const prefs = await getServerMemoryPreferences();
+  const alpha = Math.min(1, Math.max(0, Number(prefs.hybridAlpha ?? 0.62)));
+
   const scored = candidates
     .map((m) => {
       const kw = keywordScore(m, tokens, conversationId);
@@ -220,7 +226,7 @@ async function recallViaLegacyScan(
 
       if (queryEmbedding && memEmbedding) {
         const semantic = Math.max(0, cosineSimilarity(queryEmbedding, memEmbedding));
-        score = kwNorm * 0.35 + semantic * 0.55 + (m.pinned ? 0.1 : 0);
+        score = kwNorm * (1 - alpha) + semantic * alpha + (m.pinned ? 0.1 : 0);
         recallMethod = tokens.length > 0 ? "hybrid" : "semantic";
       }
 

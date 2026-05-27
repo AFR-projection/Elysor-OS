@@ -77,7 +77,7 @@ export async function backfillEmbeddingsApi(options?: {
 }
 
 export async function fetchServerMemoryPrefs(): Promise<{
-  prefs: { autoLearnFromChat: boolean };
+  prefs: { autoLearnFromChat: boolean; hybridAlpha?: number };
 }> {
   const res = await fetch("/api/memories/prefs");
   if (!res.ok) throw new Error("Failed to load memory prefs");
@@ -85,8 +85,8 @@ export async function fetchServerMemoryPrefs(): Promise<{
 }
 
 export async function updateServerMemoryPrefs(
-  patch: Partial<{ autoLearnFromChat: boolean }>
-): Promise<{ prefs: { autoLearnFromChat: boolean } }> {
+  patch: Partial<{ autoLearnFromChat: boolean; hybridAlpha: number }>
+): Promise<{ prefs: { autoLearnFromChat: boolean; hybridAlpha?: number } }> {
   const res = await fetch("/api/memories/prefs", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },

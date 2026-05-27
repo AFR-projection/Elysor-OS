@@ -2,11 +2,18 @@ import { sql } from "@/lib/db";
 
 export interface ServerMemoryPreferences {
   autoLearnFromChat: boolean;
+  /** Hybrid blending weight for vector similarity (0..1). Keyword weight = 1 - hybridAlpha */
+  hybridAlpha: number;
 }
 
 export const DEFAULT_SERVER_MEMORY_PREFERENCES: ServerMemoryPreferences = {
   autoLearnFromChat: true,
+  hybridAlpha: 0.62,
 };
+
+function clamp01(n: number): number {
+  return Math.min(1, Math.max(0, n));
+}
 
 function parsePrefs(raw: unknown): ServerMemoryPreferences {
   if (!raw || typeof raw !== "object") {
@@ -19,6 +26,10 @@ function parsePrefs(raw: unknown): ServerMemoryPreferences {
       typeof obj.autoLearnFromChat === "boolean"
         ? obj.autoLearnFromChat
         : DEFAULT_SERVER_MEMORY_PREFERENCES.autoLearnFromChat,
+    hybridAlpha:
+      typeof obj.hybridAlpha === "number"
+        ? clamp01(obj.hybridAlpha)
+        : DEFAULT_SERVER_MEMORY_PREFERENCES.hybridAlpha,
   };
 }
 
@@ -38,7 +49,14 @@ export async function updateServerMemoryPreferences(
   patch: Partial<ServerMemoryPreferences>
 ): Promise<ServerMemoryPreferences> {
   const current = await getServerMemoryPreferences();
-  const next = { ...current, ...patch };
+  const next = {
+    ...current,
+    ...patch,
+    hybridAlpha:
+      patch.hybridAlpha !== undefined
+        ? clamp01(patch.hybridAlpha)
+        : current.hybridAlpha,
+  };
 
   await sql`
     UPDATE user_settings
