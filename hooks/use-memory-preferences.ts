@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -20,35 +20,37 @@ export function useMemoryPreferences() {
   useEffect(() => {
     setPrefs(loadMemoryPreferences());
 
-    void fetchServerMemoryPrefs()
-      .then(({ prefs: serverPrefs }) => {
+    (async () => {
+      try {
+        const { prefs: serverPrefs } = await fetchServerMemoryPrefs();
         setPrefs((current) => {
           const next = { ...current, autoLearnFromChat: serverPrefs.autoLearnFromChat };
           saveMemoryPreferences(next);
           return next;
         });
-      })
-      .catch(() => {
+      } catch {
         /* local prefs only when DB unavailable */
-      });
+      }
+    })();
   }, []);
 
-  const updatePrefs = useCallback((patch: Partial<MemoryPreferences>) => {
+  const updatePrefs = useCallback(async (patch: Partial<MemoryPreferences>) => {
     setPrefs((current) => {
       const next = { ...current, ...patch };
       saveMemoryPreferences(next);
-
-      if ("autoLearnFromChat" in patch) {
-        void updateServerMemoryPrefs({
-          autoLearnFromChat: next.autoLearnFromChat,
-        }).catch(() => {
-          /* keep local toggle even if server sync fails */
-        });
-      }
-
       return next;
     });
-  }, []);
+
+    if ("autoLearnFromChat" in patch) {
+      try {
+        await updateServerMemoryPrefs({
+          autoLearnFromChat: patch.autoLearnFromChat ?? prefs.autoLearnFromChat,
+        });
+      } catch {
+        /* keep local toggle even if server sync fails */
+      }
+    }
+  }, [prefs]);
 
   return { prefs, updatePrefs };
 }

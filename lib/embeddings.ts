@@ -1,4 +1,4 @@
-const OPENROUTER_EMBEDDINGS_URL =
+﻿const OPENROUTER_EMBEDDINGS_URL =
   "https://openrouter.ai/api/v1/embeddings";
 
 /** Cheap, fast embedding model on OpenRouter */
@@ -51,6 +51,10 @@ export async function embedTexts(texts: string[]): Promise<number[][]> {
   return vectors;
 }
 
+function timeout<T>(ms: number, value: T): Promise<T> {
+  return new Promise((resolve) => setTimeout(() => resolve(value), ms));
+}
+
 export async function embedText(
   text: string,
   timeoutMs = 12_000
@@ -61,9 +65,7 @@ export async function embedText(
   try {
     const result = await Promise.race([
       embedTexts([trimmed]).then(([vector]) => vector),
-      new Promise<null>((resolve) =>
-        setTimeout(() => resolve(null), timeoutMs)
-      ),
+      timeout<null>(timeoutMs, null),
     ]);
     return result?.length ? result : null;
   } catch (error) {

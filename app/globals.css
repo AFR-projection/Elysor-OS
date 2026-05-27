@@ -807,6 +807,161 @@
   }
 }
 
+/* ============================================ */
+/* 🆕 UI/UX UPGRADE — Micro-interactions       */
+/* ============================================ */
+
+/* Scale press effect for buttons */
+.paios-btn-press {
+  transition: transform 0.12s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.paios-btn-press:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+/* FAB — Scroll-to-bottom floating button */
+.paios-fab {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.paios-fab--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.paios-fab:active {
+  transform: translateX(-50%) scale(0.92);
+}
+
+/* Enhanced welcome orb animation */
+@keyframes paios-welcome-orb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes paios-welcome-orb-float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.02); }
+}
+@keyframes paios-welcome-orb-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.08); }
+}
+@keyframes paios-welcome-orb-glow {
+  0%, 100% { filter: blur(60px) brightness(0.8); }
+  50% { filter: blur(80px) brightness(1.2); }
+}
+
+/* Staggered feature card entrance */
+.paios-feature-stagger {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: paios-feature-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes paios-feature-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.paios-feature-delay-1 { animation-delay: 0.10s; }
+.paios-feature-delay-2 { animation-delay: 0.18s; }
+.paios-feature-delay-3 { animation-delay: 0.26s; }
+.paios-feature-delay-4 { animation-delay: 0.34s; }
+.paios-feature-delay-5 { animation-delay: 0.42s; }
+.paios-feature-delay-6 { animation-delay: 0.50s; }
+
+/* Toast enter/exit animations */
+@keyframes paios-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes paios-toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+}
+
+.paios-toast-enter {
+  animation: paios-toast-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.paios-toast-exit {
+  animation: paios-toast-out 0.25s ease-in both;
+}
+
+/* Date separator */
+.paios-date-sep {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+.paios-date-sep::before,
+.paios-date-sep::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(1 0 0 / 6%),
+    transparent
+  );
+}
+
+/* Message list staggered entrance */
+@keyframes paios-message-stagger {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.paios-message-stagger {
+  animation: paios-message-stagger 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Page transition */
+@keyframes paios-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.paios-page-enter {
+  animation: paios-page-in 0.35s ease-out;
+}
+
+/* Pulse ring for FAB */
+@keyframes paios-fab-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.72 0.14 195 / 30%); }
+  50% { box-shadow: 0 0 0 8px oklch(0.72 0.14 195 / 0%); }
+}
+
 @keyframes paios-team-beam {
   0% {
     stroke-dashoffset: 24;
@@ -819,6 +974,12 @@
     stroke-dashoffset: 0;
     opacity: 0.35;
   }
+}
+
+/* 🆕 Pulse ring for FAB */
+@keyframes paios-fab-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.72 0.14 195 / 30%); }
+  50% { box-shadow: 0 0 0 10px oklch(0.72 0.14 195 / 0%); }
 }
 
 @keyframes paios-team-core-ring {

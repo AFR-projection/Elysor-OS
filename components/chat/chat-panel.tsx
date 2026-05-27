@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAgent } from "@/components/providers/agent-provider";
@@ -182,7 +182,7 @@ export function ChatPanel() {
               (a) => a.role === "synthesizer" && a.status === "running"
             );
             const teamLabel = synthRunning
-              ? `✨ Synthesizer · menggabungkan ${workers.filter((w) => w.status === "done").length}/${workers.length} hasil`
+            ? `✨ Synthesizer · menggabungkan ${workers.filter((w) => w.status === "done").length}/${workers.length} hasil`
               : runningWorkers.length > 0
                 ? `${runningWorkers.map((a) => a.emoji).join("")} · ${runningWorkers.length}/${workers.length} agent paralel`
                 : `${nextAgents.filter((a) => a.status === "done").length}/${nextAgents.length} agent selesai`;
@@ -287,8 +287,8 @@ export function ChatPanel() {
                 streamLabel:
                   event.status === "running" && isMediaTool
                     ? mediaLabel
-                    : event.status === "running"
-                      ? `Menjalankan ${event.name.replace(/_/g, " ")}…`
+            : event.status === "running"
+              ? `Menjalankan ${event.name.replace(/_/g, " ")}…`
                       : m.meta?.streamLabel,
               },
             };
@@ -308,7 +308,7 @@ export function ChatPanel() {
           setAgentState({
             status: "thinking",
             streamPhase: "tooling",
-            streamLabel: `Menjalankan ${event.name.replace(/_/g, " ")}…`,
+          streamLabel: `Menjalankan ${event.name.replace(/_/g, " ")}…`,
           });
         }
       }
@@ -692,10 +692,12 @@ export function ChatPanel() {
         isVoiceBusy={voiceInput.isBusy}
         onVoiceToggle={() => void voiceInput.toggle()}
         useAgentTeam={settings.useAgentTeam}
-        onUseAgentTeamChange={(enabled) => {
-          void updateSettings({ useAgentTeam: enabled }).catch(() => {
+        onUseAgentTeamChange={async (enabled) => {
+          try {
+            await updateSettings({ useAgentTeam: enabled });
+          } catch {
             toast("Gagal mengubah mode Use Agent", "error");
-          });
+          }
         }}
       />
     </div>

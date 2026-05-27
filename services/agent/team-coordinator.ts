@@ -192,15 +192,17 @@ export async function* runTeamAgent(
   });
 
   let workersDone = false;
-  const allWorkers = Promise.all(workerPromises).then((results) => {
+  const allWorkersPromise = Promise.all(workerPromises);
+  const workersDoneSignal = (async () => {
+    const results = await allWorkersPromise;
     workersDone = true;
     return results;
-  });
+  })();
 
   while (true) {
     const raced = await Promise.race([
       channel.next(),
-      allWorkers.then(() => "done" as const),
+      workersDoneSignal.then(() => "done" as const),
     ]);
 
     if (raced === "done") break;
@@ -220,9 +222,9 @@ export async function* runTeamAgent(
     }
   }
 
-  let workerResults: Awaited<typeof allWorkers>;
+  let workerResults: Awaited<typeof workersDoneSignal>;
   try {
-    workerResults = await allWorkers;
+    workerResults = await workersDoneSignal;
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Tim agent gagal";

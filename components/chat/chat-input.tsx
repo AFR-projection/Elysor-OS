@@ -129,7 +129,7 @@ export function ChatInput({
                 type="button"
                 size="icon"
                 onClick={onStop}
-                className="size-10 shrink-0 rounded-xl bg-red-500/85 text-white hover:bg-red-500"
+                className="paios-btn-press size-10 shrink-0 rounded-xl bg-red-500/85 text-white hover:bg-red-500"
                 aria-label="Stop generation"
               >
                 <Square className="size-3.5 fill-current" />
@@ -141,7 +141,7 @@ export function ChatInput({
                 onClick={onSend}
                 disabled={disabled || !canSend}
                 className={cn(
-                  "size-10 shrink-0 rounded-xl text-white disabled:opacity-35",
+                  "paios-btn-press size-10 shrink-0 rounded-xl text-white disabled:opacity-35",
                   useAgentTeam
                     ? "bg-violet-600 hover:bg-violet-500"
                     : "bg-cyan-600 hover:bg-cyan-500"

@@ -117,7 +117,7 @@ export function Sidebar() {
         <div className="space-y-2.5 p-3 sm:p-4">
           <Button
             variant="outline"
-            className="h-11 w-full justify-start gap-2.5 rounded-xl border-cyan-500/20 bg-cyan-500/[0.06] text-sm font-medium hover:bg-cyan-500/10"
+            className="paios-btn-press h-11 w-full justify-start gap-2.5 rounded-xl border-cyan-500/20 bg-cyan-500/[0.06] text-sm font-medium hover:bg-cyan-500/10"
             onClick={handleNewChat}
           >
             <MessageSquarePlus className="size-4 text-cyan-300" />
